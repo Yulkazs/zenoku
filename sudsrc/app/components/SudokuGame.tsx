@@ -42,15 +42,21 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
   useEffect(() => {
     if (boardRef.current && !initialized.current && !isLoading && board) {
       initialized.current = true;
-      
-      animate({
-        targets: '.sudoku-cell',
-        scale: [0, 1],
-        opacity: [0, 1],
-        delay: stagger(10, { grid: [9, 9], from: 'center' }),
-        easing: 'easeInOutQuad',
-        duration: 800
-      });
+  
+      // Ensure elements are present
+      const cells = document.querySelectorAll('.sudoku-cell');
+      if (cells.length > 0) {
+        requestAnimationFrame(() => {
+          animate({
+            targets: cells,
+            scale: [0, 1],
+            opacity: [0, 1],
+            delay: stagger(10, { grid: [9, 9], from: 'center' }),
+            easing: 'easeInOutQuad',
+            duration: 800,
+          });
+        });
+      }
     }
   }, [board, isLoading]);
 
@@ -131,27 +137,27 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
           animate={{ scale: 1, opacity: 1 }}
           className="text-center max-w-md"
         >
-          <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--foreground)' }}>
-            {isCorrect ? 'Puzzle Solved!' : 'Something\'s Not Right...'}
-          </h1>
-          
-          <div className="mb-8">
+          <div className={`mb-6 p-4 shadow-lg border-2 rounded-lg opacity-90 ${isCorrect ? 'bg-green-600 border-green-700' : 'bg-red-600 border-red-700'}`}>
+            <h1 className="text-3xl font-bold mb-4">
+                {isCorrect ? 'Puzzle Solved!' : 'Oops, Puzzle Not Solved!'}
+            </h1>
+            </div>
+
+            <div className="mb-8">
             <p className="subtext text-lg mb-4">
-              {isCorrect 
-                ? 'Congratulations! You successfully completed the puzzle.' 
-                : 'There might be some errors in your solution. Check again?'
-              }
+                {isCorrect
+                ? 'Congratulations! You successfully completed the puzzle.'
+                : 'It looks like something went wrong. No worries, though! Click below to try a new puzzle and keep challenging yourself!'}
             </p>
-          </div>
+            </div>
           
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center"> 
             <button 
               onClick={newPuzzle}
               className="px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
             >
               New Puzzle
-            </button>
-            
+            </button> 
             <button 
               onClick={onExit}
               className="px-6 py-2 rounded-lg font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
@@ -217,11 +223,12 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
         {board && (
           <div 
             ref={boardRef}
+            id="container"
             className="grid grid-cols-9 gap-px bg-gray-300 dark:bg-gray-700 border-2 border-gray-500 dark:border-gray-600 rounded-lg overflow-hidden mb-6"
           >
             {board.map((row, rowIndex) => 
               row.map((cell, colIndex) => (
-                <div 
+                <div                 
                   key={`${rowIndex}-${colIndex}`}
                   className={`sudoku-cell aspect-square flex items-center justify-center text-lg font-semibold ${
                     selectedCell && selectedCell[0] === rowIndex && selectedCell[1] === colIndex
@@ -252,6 +259,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
               onClick={() => handleNumberInput(num)}
               className="py-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
               style={{ color: 'var(--foreground)' }}
+              id="container"
             >
               {num}
             </button>
@@ -260,6 +268,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
             onClick={clearCell}
             className="py-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
             style={{ color: 'var(--foreground)' }}
+            id="container"
           >
             Clear
           </button>
@@ -267,15 +276,8 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
         
         <div className="flex justify-between">
           <button 
-            onClick={newPuzzle}
-            className="px-4 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-          >
-            New Puzzle
-          </button>
-          
-          <button 
             onClick={onExit}
-            className="px-4 py-2 rounded-lg font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+            className="px-4 py-2 rounded-lg font-semibold text-white-100 bg-red-600 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
           >
             Exit
           </button>
