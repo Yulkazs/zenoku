@@ -2,12 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-// Try dynamic import with the Next.js-friendly approach
-import dynamic from 'next/dynamic';
 import { generateSudoku, checkSudoku, SudokuType } from '@/app/utils/sudokuUtils';
 
-// Dynamically import anime.js with no SSR
-const AnimationModule = dynamic(() => import('animejs'), { ssr: false });
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
