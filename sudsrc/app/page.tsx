@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
+import { Coffee } from 'lucide-react';
 import SudokuGame from '@/app/components/SudokuGame';
+import WaveGraphic from './components/WaveGraphic';
 
 export default function Home() {
   const [gameStarted, setGameStarted] = useState(false);
@@ -13,18 +14,22 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
+    <div className="relative min-h-screen flex flex-col items-center justify-start pt-28 px-4 z-0" style={{ backgroundColor: 'var(--background)' }}>
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center max-w-2xl mx-auto"
+        className="text-center max-w-4xl mx-auto"
       >
         <h1 className="text-5xl font-bold mb-6" style={{ color: 'var(--foreground)' }}>
+          <span className="text-blue-600">ゼノク</span> <br />
           Zenoku
         </h1>
-        <p className="subtext text-xl mb-8">Experience the calming challenge of Sudoku</p>
-        
+        <p className="subtext text-xl mb-8">
+          Experience the calming challenge of Sudoku
+          <Coffee className="inline-block ml-2" size={16} />
+        </p>
+
         <div className="mb-10">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -35,20 +40,32 @@ export default function Home() {
             Start Game
           </motion.button>
         </div>
-        
-        <div id="container" className="max-w-md mx-auto mb-8 p-6">
+
+        <div id="container" className="max-w-lvh mx-auto mb-10 mt-20 p-6">
           <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--foreground)' }}>
             How to Play
           </h2>
           <ul className="text-left subtext space-y-2">
-            <li>• Fill the 9×9 grid with digits 1-9</li>
-            <li>• Each row must contain all digits 1-9</li>
-            <li>• Each column must contain all digits 1-9</li>
-            <li>• Each 3×3 box must contain all digits 1-9</li>
+            <li>
+              <span className="font-medium text-blue-500">•</span>{' '}
+              <span>Fill the <strong>9×9 grid</strong> so that every cell contains a digit from <strong>1 to 9</strong>.</span>
+            </li>
+            <li>
+              <span className="font-medium text-blue-500">•</span>{' '}
+              <span>Each <strong>row</strong> must contain <strong>all digits from 1 to 9</strong>, without repeating.</span>
+            </li>
+            <li>
+              <span className="font-medium text-blue-500">•</span>{' '}
+              <span>Each <strong>column</strong> must also include <strong>all digits from 1 to 9</strong>.</span>
+            </li>
+            <li>
+              <span className="font-medium text-blue-500">•</span>{' '}
+              <span>Each of the <strong>nine 3×3 subgrids</strong> must contain <strong>all digits from 1 to 9</strong>.</span>
+            </li>
           </ul>
         </div>
-        
-        <div id="container" className="max-w-md mx-auto">
+
+        <div id="container" className="max-w-lvh mx-auto">
           <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--foreground)' }}>
             Difficulty Levels
           </h2>
@@ -69,6 +86,7 @@ export default function Home() {
           </div>
         </div>
       </motion.div>
+      <WaveGraphic />
     </div>
   );
 }
