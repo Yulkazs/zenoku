@@ -76,7 +76,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     setIsComplete(false);
   }, [selectedCell, board]);
 
-  const useHint = useCallback(() => {
+  const applyHint  = useCallback(() => {
     if (!selectedCell || !board || !solution || hintsRemaining <= 0) return;
 
     const [row, col] = selectedCell;
@@ -141,13 +141,13 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         clearCell();
       } else if (e.key === 'h' || e.key === 'H') {
-        useHint();
+        applyHint ();
       }
     };
   
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedCell, board, handleNumberInput, clearCell, useHint]);
+  }, [selectedCell, board, handleNumberInput, clearCell, applyHint ]);
 
   if (isLoading) {
     return (
@@ -318,7 +318,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
           </button>
           
           <button
-            onClick={useHint}
+            onClick={applyHint}
             disabled={hintsRemaining <= 0 || !selectedCell}
             className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow-md
               ${hintsRemaining > 0 
