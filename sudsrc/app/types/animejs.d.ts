@@ -30,15 +30,18 @@ declare module 'animejs' {
       [method: string]: any;
     }
   
-    export function stagger(value: number | string, options?: StaggerParams): Function;
-    export function animate(params: AnimeParams): AnimeInstance;
-    
-    export let speed: number;
-    export let running: any[];
+    // Export stagger and other utilities as properties of the default export
+    const anime: {
+      (params: AnimeParams): AnimeInstance;
+      stagger(value: number | string, options?: StaggerParams): Function;
+      speed: number;
+      running: any[];
+      remove(targets: any): void;
+      get(targets: any, prop: string): any;
+      set(targets: any, props: any): void;
+      random(min: number, max: number): number;
+      timeline(params?: AnimeParams | null): AnimeInstance;
+    };
   
-    export function remove(targets: any): void;
-    export function get(targets: any, prop: string): any;
-    export function set(targets: any, props: any): void;
-    export function random(min: number, max: number): number;
-    export function timeline(params?: AnimeParams | null): AnimeInstance;
+    export default anime;
   }

@@ -2,8 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { animate, stagger } from 'animejs';
+// Try dynamic import with the Next.js-friendly approach
+import dynamic from 'next/dynamic';
 import { generateSudoku, checkSudoku, SudokuType } from '@/app/utils/sudokuUtils';
+
+// Dynamically import anime.js with no SSR
+const AnimationModule = dynamic(() => import('animejs'), { ssr: false });
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
@@ -43,18 +47,29 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     if (boardRef.current && !initialized.current && !isLoading && board) {
       initialized.current = true;
   
-      // Ensure elements are present
+      // Perform simpler animation with CSS transitions instead of anime.js
       const cells = document.querySelectorAll('.sudoku-cell');
       if (cells.length > 0) {
-        requestAnimationFrame(() => {
-          animate({
-            targets: cells,
-            scale: [0, 1],
-            opacity: [0, 1],
-            delay: stagger(10, { grid: [9, 9], from: 'center' }),
-            easing: 'easeInOutQuad',
-            duration: 800,
-          });
+        cells.forEach((cell, index) => {
+          const htmlCell = cell as HTMLElement;
+          // Calculate row and column from index for delay
+          const row = Math.floor(index / 9);
+          const col = index % 9;
+          // Calculate distance from center
+          const centerRow = 4;
+          const centerCol = 4;
+          const distance = Math.sqrt(Math.pow(row - centerRow, 2) + Math.pow(col - centerCol, 2));
+          
+          // Set initial state
+          htmlCell.style.opacity = '0';
+          htmlCell.style.transform = 'scale(0)';
+          htmlCell.style.transition = 'opacity 500ms ease, transform 500ms ease';
+          
+          // Trigger animation with delay
+          setTimeout(() => {
+            htmlCell.style.opacity = '1';
+            htmlCell.style.transform = 'scale(1)';
+          }, distance * 20); // Delay based on distance from center
         });
       }
     }
