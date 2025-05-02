@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { generateSudoku, checkSudoku, SudokuType } from '@/app/utils/sudokuUtils';
-
+import { Sparkles } from 'lucide-react';
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
 
@@ -19,8 +19,10 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
   const [isComplete, setIsComplete] = useState<boolean>(false);
   const [isCorrect, setIsCorrect] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [hintsRemaining, setHintsRemaining] = useState<number>(4);
   const boardRef = useRef<HTMLDivElement>(null);
   const initialized = useRef<boolean>(false);
+  const gameContainerRef = useRef<HTMLDivElement>(null);
 
   // Generate a new Sudoku puzzle when difficulty changes
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     setSelectedCell(null);
     setIsComplete(false);
     setIsCorrect(false);
+    setHintsRemaining(4); // Reset hints when changing difficulty
     
     // Reset UI state
     setTimeout(() => {
@@ -70,6 +73,56 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
       }
     }
   }, [board, isLoading]);
+
+  // Handle keyboard input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Number keys (both top row and numpad)
+      if ((/^[1-9]$/.test(e.key) || (e.key >= 'Numpad1' && e.key <= 'Numpad9'))) {
+        const num = parseInt(e.key.replace('Numpad', ''), 10);
+        handleNumberInput(num);
+      }
+      // Arrow keys for navigation
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
+               e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        if (!selectedCell) {
+          setSelectedCell([4, 4]); // Start in the middle if no cell is selected
+          return;
+        }
+        
+        const [row, col] = selectedCell;
+        let newRow = row;
+        let newCol = col;
+        
+        switch (e.key) {
+          case 'ArrowUp': newRow = Math.max(0, row - 1); break;
+          case 'ArrowDown': newRow = Math.min(8, row + 1); break;
+          case 'ArrowLeft': newCol = Math.max(0, col - 1); break;
+          case 'ArrowRight': newCol = Math.min(8, col + 1); break;
+        }
+        
+        setSelectedCell([newRow, newCol]);
+      }
+      // Delete or Backspace to clear cell
+      else if (e.key === 'Delete' || e.key === 'Backspace') {
+        clearCell();
+      }
+      // H key for hint
+      else if (e.key === 'h' || e.key === 'H') {
+        useHint();
+      }
+    };
+
+    // Focus on game container to capture keyboard events
+    if (gameContainerRef.current) {
+      gameContainerRef.current.focus();
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedCell, board]);
 
   // Handle cell selection
   const handleCellSelect = (row: number, col: number) => {
@@ -113,6 +166,30 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     setIsComplete(false);
   };
 
+  // Use a hint to reveal a cell
+  const useHint = () => {
+    if (!selectedCell || !board || !solution || hintsRemaining <= 0) return;
+    
+    const [row, col] = selectedCell;
+    if (board[row][col].fixed || board[row][col].value === solution[row][col]) return;
+    
+    const newBoard = [...board];
+    newBoard[row][col] = { value: solution[row][col], fixed: true };
+    setBoard(newBoard);
+    setHintsRemaining(prev => prev - 1);
+    
+    // Check if the board is complete after using hint
+    const allFilled = newBoard.every(row => 
+      row.every(cell => cell.value !== 0)
+    );
+    
+    if (allFilled) {
+      const isSolutionCorrect = checkSudoku(newBoard);
+      setIsComplete(true);
+      setIsCorrect(isSolutionCorrect);
+    }
+  };
+
   // Generate a new puzzle with the same difficulty
   const newPuzzle = () => {
     setIsLoading(true);
@@ -123,6 +200,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
       setSelectedCell(null);
       setIsComplete(false);
       setIsCorrect(false);
+      setHintsRemaining(4); // Reset hints for new puzzle
       setIsLoading(false);
       
       // Re-animate board appearance
@@ -133,8 +211,9 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
   // Render loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="text-4xl font-bold mb-4 text-blue-600">Loading...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800" style={{ backgroundColor: 'var(--background)' }}>
+        <div className="text-4xl font-bold mb-4 text-blue-600 font-serif">読み込み中...</div>
+        <div className="text-xl text-gray-600 dark:text-gray-400 font-serif">Loading...</div>
       </div>
     );
   }
@@ -142,22 +221,22 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
   // Render complete game state
   if (isComplete) {
     return (
-      <div className="min-h-screen p-4 flex flex-col items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="min-h-screen p-4 flex flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800" style={{ backgroundColor: 'var(--background)' }}>
         <motion.div 
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="text-center max-w-md"
         >
           <div className={`mb-6 p-4 shadow-lg border-2 rounded-lg opacity-90 ${isCorrect ? 'bg-green-600 border-green-700' : 'bg-red-600 border-red-700'}`}>
-            <h1 className="text-3xl font-bold mb-4">
-                {isCorrect ? 'Puzzle Solved!' : 'Oops, Puzzle Not Solved!'}
+            <h1 className="text-3xl font-bold mb-4 font-serif">
+                {isCorrect ? '成功！Puzzle Solved!' : '残念！Puzzle Not Solved!'}
             </h1>
             </div>
 
             <div className="mb-8">
-            <p className="subtext text-lg mb-4">
+            <p className="subtext text-lg mb-4 font-serif">
                 {isCorrect
-                ? 'Congratulations! You successfully completed the puzzle.'
+                ? 'おめでとう！Congratulations! You successfully completed the puzzle.'
                 : 'It looks like something went wrong. No worries, though! Click below to try a new puzzle and keep challenging yourself!'}
             </p>
             </div>
@@ -165,13 +244,13 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
           <div className="flex gap-4 justify-center"> 
             <button 
               onClick={newPuzzle}
-              className="px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors font-serif"
             >
               New Puzzle
             </button> 
             <button 
               onClick={onExit}
-              className="px-6 py-2 rounded-lg font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+              className="px-6 py-2 rounded-lg font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 font-serif"
             >
               Exit
             </button>
@@ -183,18 +262,23 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
 
   // Render main game board
   return (
-    <div className="min-h-screen p-4" style={{ backgroundColor: 'var(--background)' }}>
+    <div 
+      ref={gameContainerRef}
+      tabIndex={0} // Make div focusable for keyboard events
+      className="min-h-screen p-4 outline-none bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800"
+      style={{ backgroundColor: 'var(--background)' }}
+    >
       <div className="max-w-lg mx-auto">
         <div className="flex justify-between items-center mb-6">
           <button 
             onClick={onExit}
-            className="px-4 py-2 rounded-lg font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+            className="px-4 py-2 rounded-lg font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 font-serif"
           >
             Back
           </button>
           
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
-            Zenoku
+          <h1 className="text-2xl font-bold font-serif" style={{ color: 'var(--foreground)' }}>
+            禅数独 Zenoku
           </h1>
           
           <div className="invisible px-4 py-2">
@@ -203,30 +287,30 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
         </div>
         
         <div className="flex justify-center mb-6">
-          <div className="inline-flex rounded-lg overflow-hidden">
+          <div className="inline-flex rounded-lg overflow-hidden shadow-md">
             <button 
               onClick={() => setDifficulty('beginner')}
-              className={`px-4 py-2 font-medium ${difficulty === 'beginner' 
+              className={`px-4 py-2 font-medium font-serif ${difficulty === 'beginner' 
                 ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                : 'bg-gray-700 text-gray-200 hover:bg-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
             >
-              Beginner
+              初級 Beginner
             </button>
             <button 
               onClick={() => setDifficulty('intermediate')}
-              className={`px-4 py-2 font-medium ${difficulty === 'intermediate' 
+              className={`px-4 py-2 font-medium font-serif ${difficulty === 'intermediate' 
                 ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                : 'bg-gray-700 text-gray-200 hover:bg-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
             >
-              Intermediate
+              中級 Intermediate
             </button>
             <button 
               onClick={() => setDifficulty('advanced')}
-              className={`px-4 py-2 font-medium ${difficulty === 'advanced' 
+              className={`px-4 py-2 font-medium font-serif ${difficulty === 'advanced' 
                 ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
+                : 'bg-gray-700 text-gray-200 hover:bg-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'}`}
             >
-              Advanced
+              上級 Advanced
             </button>
           </div>
         </div>
@@ -235,7 +319,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
           <div 
             ref={boardRef}
             id="container"
-            className="grid grid-cols-9 gap-px bg-gray-300 dark:bg-gray-700 border-2 border-gray-500 dark:border-gray-600 rounded-lg overflow-hidden mb-6"
+            className="grid grid-cols-9 gap-px bg-gray-300 dark:bg-gray-700 border-2 border-gray-500 dark:border-gray-600 rounded-lg overflow-hidden mb-6 shadow-lg"
           >
             {board.map((row, rowIndex) => 
               row.map((cell, colIndex) => (
@@ -268,7 +352,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
             <button
               key={num}
               onClick={() => handleNumberInput(num)}
-              className="py-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+              className="py-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-blue-200 dark:bg-gray-800 dark:hover:bg-blue-800 transition-colors font-serif shadow-md"
               style={{ color: 'var(--foreground)' }}
               id="container"
             >
@@ -277,7 +361,7 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
           ))}
           <button
             onClick={clearCell}
-            className="py-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+            className="py-3 text-lg font-semibold rounded-md bg-gray-200 hover:bg-red-200 dark:bg-gray-800 dark:hover:bg-red-900 transition-colors font-serif shadow-md"
             style={{ color: 'var(--foreground)' }}
             id="container"
           >
@@ -285,13 +369,37 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
           </button>
         </div>
         
-        <div className="flex justify-between">
+        <div className="flex justify-between items-center mb-6">
           <button 
             onClick={onExit}
-            className="px-4 py-2 rounded-lg font-semibold text-white-100 bg-red-600 hover:bg-gray-300 transition-colors dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+            className="px-4 py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors font-serif shadow-md"
           >
             Exit
           </button>
+          
+          <button
+            onClick={useHint}
+            disabled={hintsRemaining <= 0 || !selectedCell}
+            className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 shadow-md font-serif
+              ${hintsRemaining > 0 
+                ? 'text-white bg-amber-600 hover:bg-amber-700' 
+                : 'text-gray-400 bg-gray-300 dark:text-gray-500 dark:bg-gray-800 cursor-not-allowed'}`}
+          >
+            <Sparkles className="w-5 h-5" />
+            <span>ヒント Hint ({hintsRemaining})</span>
+          </button>
+          
+          <button 
+            onClick={newPuzzle}
+            className="px-4 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors font-serif shadow-md"
+          >
+            New Game
+          </button>
+        </div>
+        
+        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400 font-serif">
+          <p>キーボードを使用: 1-9で数字を入力、矢印キーで移動、BackspaceまたはDelete で削除、Hでヒント</p>
+          <p>Use keyboard: 1-9 for numbers, arrow keys to navigate, Backspace or Delete to clear, H for hint</p>
         </div>
       </div>
     </div>
