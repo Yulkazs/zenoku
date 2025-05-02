@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import anime from 'animejs';
+import { animate, stagger } from 'animejs';
 import { generateSudoku, checkSudoku, SudokuType } from '@/app/utils/sudokuUtils';
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
@@ -43,11 +43,11 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     if (boardRef.current && !initialized.current && !isLoading && board) {
       initialized.current = true;
       
-      anime({
+      animate({
         targets: '.sudoku-cell',
         scale: [0, 1],
         opacity: [0, 1],
-        delay: anime.stagger(10, { grid: [9, 9], from: 'center' }),
+        delay: stagger(10, { grid: [9, 9], from: 'center' }),
         easing: 'easeInOutQuad',
         duration: 800
       });
