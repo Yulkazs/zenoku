@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { generateSudoku, checkSudoku, SudokuType } from '@/app/utils/sudokuUtils';
-import WaveGraphic from '@/app/components/WaveGraphic';
 import { Sparkles } from 'lucide-react';
 
 type Difficulty = 'beginner' | 'intermediate' | 'advanced';
@@ -25,7 +24,6 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
   const initialized = useRef<boolean>(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
 
-  // Generate a new Sudoku puzzle when difficulty changes
   useEffect(() => {
     setIsLoading(true);
     const { puzzle, solution } = generateSudoku(difficulty);
@@ -34,164 +32,72 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     setSelectedCell(null);
     setIsComplete(false);
     setIsCorrect(false);
-    setHintsRemaining(4); // Reset hints when changing difficulty
-    
-    // Reset UI state
+    setHintsRemaining(4);
     setTimeout(() => {
       setIsLoading(false);
     }, 500);
   }, [difficulty]);
 
-  // Animate board appearance when it's first rendered
-  useEffect(() => {
-    if (boardRef.current && !initialized.current && !isLoading && board) {
-      initialized.current = true;
-  
-      // Perform simpler animation with CSS transitions instead of anime.js
-      const cells = document.querySelectorAll('.sudoku-cell');
-      if (cells.length > 0) {
-        cells.forEach((cell, index) => {
-          const htmlCell = cell as HTMLElement;
-          // Calculate row and column from index for delay
-          const row = Math.floor(index / 9);
-          const col = index % 9;
-          // Calculate distance from center
-          const centerRow = 4;
-          const centerCol = 4;
-          const distance = Math.sqrt(Math.pow(row - centerRow, 2) + Math.pow(col - centerCol, 2));
-          
-          // Set initial state
-          htmlCell.style.opacity = '0';
-          htmlCell.style.transform = 'scale(0)';
-          htmlCell.style.transition = 'opacity 500ms ease, transform 500ms ease';
-          
-          // Trigger animation with delay
-          setTimeout(() => {
-            htmlCell.style.opacity = '1';
-            htmlCell.style.transform = 'scale(1)';
-          }, distance * 20); // Delay based on distance from center
-        });
-      }
-    }
-  }, [board, isLoading]);
-
-  // Handle keyboard input
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Number keys (both top row and numpad)
-      if ((/^[1-9]$/.test(e.key) || (e.key >= 'Numpad1' && e.key <= 'Numpad9'))) {
-        const num = parseInt(e.key.replace('Numpad', ''), 10);
-        handleNumberInput(num);
-      }
-      // Arrow keys for navigation
-      else if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || 
-               e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        if (!selectedCell) {
-          setSelectedCell([4, 4]); // Start in the middle if no cell is selected
-          return;
-        }
-        
-        const [row, col] = selectedCell;
-        let newRow = row;
-        let newCol = col;
-        
-        switch (e.key) {
-          case 'ArrowUp': newRow = Math.max(0, row - 1); break;
-          case 'ArrowDown': newRow = Math.min(8, row + 1); break;
-          case 'ArrowLeft': newCol = Math.max(0, col - 1); break;
-          case 'ArrowRight': newCol = Math.min(8, col + 1); break;
-        }
-        
-        setSelectedCell([newRow, newCol]);
-      }
-      // Delete or Backspace to clear cell
-      else if (e.key === 'Delete' || e.key === 'Backspace') {
-        clearCell();
-      }
-      // H key for hint
-      else if (e.key === 'h' || e.key === 'H') {
-        useHint();
-      }
-    };
-
-    // Focus on game container to capture keyboard events
-    if (gameContainerRef.current) {
-      gameContainerRef.current.focus();
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [selectedCell, board]);
-
-  // Handle cell selection
   const handleCellSelect = (row: number, col: number) => {
     if (board && board[row][col].fixed) return;
     setSelectedCell([row, col]);
   };
 
-  // Handle number input
-  const handleNumberInput = (num: number) => {
+  const handleNumberInput = useCallback((num: number) => {
     if (!selectedCell || !board) return;
-    
+
     const [row, col] = selectedCell;
     if (board[row][col].fixed) return;
-    
+
     const newBoard = [...board];
     newBoard[row][col] = { value: num, fixed: false };
     setBoard(newBoard);
-    
-    // Check if the board is complete
-    const allFilled = newBoard.every(row => 
+
+    const allFilled = newBoard.every(row =>
       row.every(cell => cell.value !== 0)
     );
-    
+
     if (allFilled) {
       const isSolutionCorrect = checkSudoku(newBoard);
       setIsComplete(true);
       setIsCorrect(isSolutionCorrect);
     }
-  };
+  }, [selectedCell, board]);
 
-  // Clear selected cell
-  const clearCell = () => {
+  const clearCell = useCallback(() => {
     if (!selectedCell || !board) return;
-    
+
     const [row, col] = selectedCell;
     if (board[row][col].fixed) return;
-    
+
     const newBoard = [...board];
     newBoard[row][col] = { value: 0, fixed: false };
     setBoard(newBoard);
     setIsComplete(false);
-  };
+  }, [selectedCell, board]);
 
-  // Use a hint to reveal a cell
-  const useHint = () => {
+  const useHint = useCallback(() => {
     if (!selectedCell || !board || !solution || hintsRemaining <= 0) return;
-    
+
     const [row, col] = selectedCell;
     if (board[row][col].fixed || board[row][col].value === solution[row][col]) return;
-    
+
     const newBoard = [...board];
     newBoard[row][col] = { value: solution[row][col], fixed: true };
     setBoard(newBoard);
     setHintsRemaining(prev => prev - 1);
-    
-    // Check if the board is complete after using hint
+
     const allFilled = newBoard.every(row => 
       row.every(cell => cell.value !== 0)
     );
-    
+
     if (allFilled) {
       const isSolutionCorrect = checkSudoku(newBoard);
       setIsComplete(true);
       setIsCorrect(isSolutionCorrect);
     }
-  };
+  }, [selectedCell, board, solution, hintsRemaining]);
 
-  // Generate a new puzzle with the same difficulty
   const newPuzzle = () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -201,15 +107,48 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
       setSelectedCell(null);
       setIsComplete(false);
       setIsCorrect(false);
-      setHintsRemaining(4); // Reset hints for new puzzle
+      setHintsRemaining(4);
       setIsLoading(false);
-      
-      // Re-animate board appearance
       initialized.current = false;
     }, 300);
   };
 
-  // Render loading state
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (/^[1-9]$/.test(e.key)) {
+        const num = parseInt(e.key, 10);
+        handleNumberInput(num);
+      } else if (e.key.startsWith('Numpad') && /^[1-9]$/.test(e.key.slice(-1))) {
+        const num = parseInt(e.key.slice(-1), 10);
+        handleNumberInput(num);
+      } else if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        if (!selectedCell) {
+          setSelectedCell([4, 4]);
+          return;
+        }
+        const [row, col] = selectedCell;
+        let newRow = row;
+        let newCol = col;
+  
+        switch (e.key) {
+          case 'ArrowUp': newRow = Math.max(0, row - 1); break;
+          case 'ArrowDown': newRow = Math.min(8, row + 1); break;
+          case 'ArrowLeft': newCol = Math.max(0, col - 1); break;
+          case 'ArrowRight': newCol = Math.min(8, col + 1); break;
+        }
+  
+        setSelectedCell([newRow, newCol]);
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        clearCell();
+      } else if (e.key === 'h' || e.key === 'H') {
+        useHint();
+      }
+    };
+  
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedCell, board, handleNumberInput, clearCell, useHint]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800" style={{ backgroundColor: 'var(--background)' }}>
@@ -219,7 +158,6 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
     );
   }
 
-  // Render complete game state
   if (isComplete) {
     return (
       <div className="min-h-screen p-4 flex flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800" style={{ backgroundColor: 'var(--background)' }}>
@@ -232,16 +170,16 @@ export default function SudokuGame({ onExit }: SudokuGameProps) {
             <h1 className="text-3xl font-bold mb-4">
                 {isCorrect ? 'Puzzle Solved!' : 'Puzzle Not Solved!'}
             </h1>
-            </div>
+          </div>
 
-            <div className="mb-8">
+          <div className="mb-8">
             <p className="subtext text-lg mb-4">
-                {isCorrect
-                ? 'Congratulations! You successfully completed the puzzle.'
-                : 'It looks like something went wrong. No worries, though! Click below to try a new puzzle and keep challenging yourself!'}
+              {isCorrect
+              ? 'Congratulations! You successfully completed the puzzle.'
+              : 'It looks like something went wrong. No worries, though! Click below to try a new puzzle and keep challenging yourself!'}
             </p>
-            </div>
-          
+          </div>
+        
           <div className="flex gap-4 justify-center"> 
             <button 
               onClick={newPuzzle}
