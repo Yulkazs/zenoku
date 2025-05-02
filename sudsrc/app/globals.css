@@ -3,6 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --subtext: #9b9b9c;
+  --container: #f3f4f6;
+  --transition-duration: 0.3s;
+  --transition-timing: ease;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --subtext: #aaacad;
+  --container: #323233;
 }
 
 @theme inline {
@@ -12,15 +23,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Apply transition to all elements */
+*, *::before, *::after {
+  transition: background-color var(--transition-duration) var(--transition-timing),
+              color var(--transition-duration) var(--transition-timing),
+              border-color var(--transition-duration) var(--transition-timing),
+              box-shadow var(--transition-duration) var(--transition-timing);
+}
+
+/* Prevent transitions on page load */
+.no-transition * {
+  transition: none !important;
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.subtext {
+  color: var(--subtext);
+}
+
+#container {
+  background-color: var(--container);
+  border-radius: 0.5rem;
+  padding: 1rem;
 }

@@ -4,8 +4,8 @@ import { ThemeSwitcher } from './ThemeSwitcher';
 
 export function Navbar() {
   return (
-    <nav className="flex items-center justify-between px-4 py-3 dark:bg-gray-900 shadow-sm">
-      <div className="font-bold text-black dark:text-white">Your App Name</div>
+    <nav className="flex items-center justify-between px-4 py-3 shadow-sm" style={{ backgroundColor: 'var(--background)' }}>
+      <div className="font-bold" style={{ color: 'var(--foreground)' }}>Your App Name</div>
       <ThemeSwitcher />
     </nav>
   );
