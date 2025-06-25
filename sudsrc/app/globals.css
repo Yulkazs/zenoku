@@ -1,19 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --subtext: #9b9b9c;
-  --container: #f3f4f6;
+  --background: #EFDAB6;
+  --foreground: #43271B;
+  --subtext: #6B4E3D;
+  --container: #E5CFA3;
+  --accent: #8B4513;
   --transition-duration: 0.3s;
   --transition-timing: ease;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --subtext: #aaacad;
-  --container: #323233;
+  --background: #181A1D;
+  --foreground: #EFDAB6;
+  --subtext: #C4B89A;
+  --container: #2A2D32;
+  --accent: #D4AF37;
 }
 
 @theme inline {
@@ -39,7 +41,7 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Noto Sans JP', Arial, Helvetica, sans-serif;
 }
 
 .subtext {
@@ -48,6 +50,44 @@ body {
 
 #container {
   background-color: var(--container);
-  border-radius: 0.5rem;
-  padding: 1rem;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 2px solid var(--accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Japanese typography */
+.japanese-title {
+  font-family: 'Noto Serif JP', serif;
+  letter-spacing: 0.1em;
+}
+
+.zen-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(139, 69, 19, 0.1) 0%, transparent 50%);
+}
+
+.dark .zen-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--container);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--foreground);
 }

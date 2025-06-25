@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Coffee } from 'lucide-react';
 import SudokuGame from '@/app/components/SudokuGame';
-import WaveGraphic from './components/WaveGraphic';
 
 export default function Home() {
   const [gameStarted, setGameStarted] = useState(false);
@@ -14,79 +12,64 @@ export default function Home() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-start pt-28 px-4 z-0" style={{ backgroundColor: 'var(--background)' }}>
-      <motion.div 
+    <div
+      className="relative min-h-screen flex flex-col items-center justify-center bg-[url('/patterns/waves.svg')] bg-no-repeat bg-cover px-4"
+      style={{ backgroundColor: 'var(--zen-background)' }}
+    >
+      {/* Decorative bamboo or wave SVGs can be added here with absolute positioning */}
+
+      {/* Background Japanese Waves */}
+      <img
+        src="/patterns/seigaiha.svg"
+        alt="waves pattern"
+        className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none"
+      />
+
+      {/* Left Bamboo */}
+      <img
+        src="/patterns/bamboo-jp.svg"
+        alt="bamboo left"
+        className="absolute left-0 top-0 h-full opacity-10"
+      />
+
+      {/* Right Bamboo (mirrored) */}
+      <img
+        src="/patterns/bamboo-jp.svg"
+        alt="bamboo right"
+        className="absolute right-0 top-0 h-full opacity-10 scale-x-[-1]"
+      />
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center max-w-4xl mx-auto"
+        transition={{ duration: 0.6 }}
+        className="text-center max-w-xl mx-auto px-4"
       >
-        <h1 className="text-5xl font-bold mb-6" style={{ color: 'var(--foreground)' }}>
-          <span className="text-blue-600">ゼノク</span> <br />
-          Zenoku
+        {/* Zenoku Logo */}
+        <div className="mb-8">
+          <img src="/logo/zenoku-logo.svg" alt="Zenoku Logo" className="mx-auto w-24 h-24" />
+        </div>
+
+        {/* Title */}
+        <h1 className="text-5xl font-serif font-semibold mb-4 text-[var(--zen-foreground)]">
+          ZENOKU
         </h1>
-        <p className="subtext text-xl mb-8">
-          Experience the calming challenge of Sudoku
-          <Coffee className="inline-block ml-2" size={16} />
+
+        {/* Tagline */}
+        <p className="text-xl mb-8 font-light text-[var(--zen-foreground)]">
+          Sudoku with a touch of Zen
         </p>
 
-        <div className="mb-10">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setGameStarted(true)}
-            className="px-8 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-          >
-            Start Game
-          </motion.button>
-        </div>
-
-        <div id="container" className="max-w-lvh mx-auto mb-10 mt-20 p-6">
-          <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--foreground)' }}>
-            How to Play
-          </h2>
-          <ul className="text-left subtext space-y-2">
-            <li>
-              <span className="font-medium text-blue-500">•</span>{' '}
-              <span>Fill the <strong>9×9 grid</strong> so that every cell contains a digit from <strong>1 to 9</strong>.</span>
-            </li>
-            <li>
-              <span className="font-medium text-blue-500">•</span>{' '}
-              <span>Each <strong>row</strong> must contain <strong>all digits from 1 to 9</strong>, without repeating.</span>
-            </li>
-            <li>
-              <span className="font-medium text-blue-500">•</span>{' '}
-              <span>Each <strong>column</strong> must also include <strong>all digits from 1 to 9</strong>.</span>
-            </li>
-            <li>
-              <span className="font-medium text-blue-500">•</span>{' '}
-              <span>Each of the <strong>nine 3×3 subgrids</strong> must contain <strong>all digits from 1 to 9</strong>.</span>
-            </li>
-          </ul>
-        </div>
-
-        <div id="container" className="max-w-lvh mx-auto">
-          <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--foreground)' }}>
-            Difficulty Levels
-          </h2>
-          <p className="subtext mb-4">Start with Beginner and work your way up to Advanced as your skills improve!</p>
-          <div className="flex justify-between">
-            <div className="text-center p-2">
-              <div className="font-semibold" style={{ color: 'var(--foreground)' }}>Beginner</div>
-              <div className="subtext">For newcomers</div>
-            </div>
-            <div className="text-center p-2">
-              <div className="font-semibold" style={{ color: 'var(--foreground)' }}>Intermediate</div>
-              <div className="subtext">For regulars</div>
-            </div>
-            <div className="text-center p-2">
-              <div className="font-semibold" style={{ color: 'var(--foreground)' }}>Advanced</div>
-              <div className="subtext">For experts</div>
-            </div>
-          </div>
-        </div>
+        {/* CTA Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setGameStarted(true)}
+          className="px-8 py-3 border border-[var(--zen-foreground)] rounded-lg text-[var(--zen-foreground)] font-medium hover:bg-[var(--zen-foreground)] hover:text-[var(--zen-background)] transition-colors"
+        >
+          Play
+        </motion.button>
       </motion.div>
-      <WaveGraphic />
     </div>
   );
 }
