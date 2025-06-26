@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <div
-      className="relative mt-50 flex flex-col items-center justify-center bg-no-repeat bg-cover px-4"
+      className="relative min-h-screen flex flex-col items-center justify-start md:justify-center bg-no-repeat bg-cover px-4 pt-16 md:pt-0"
       style={{ backgroundColor: 'var(--zen-background)' }}
     >
       {/* Decorative bamboo or wave SVGs can be added here with absolute positioning */}
@@ -29,31 +29,31 @@ export default function Home() {
         className="text-center max-w-xl mx-auto px-4"
       >
         {/* Zenoku Logo */}
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <img 
             src={theme === 'dark' ? "/zen-dark-logo.png" : "/zen-light-logo.png"} 
             alt="Zenoku Logo" 
-            className="mx-auto w-24 h-24" 
+            className="mx-auto w-20 h-20 md:w-24 md:h-24 drop-shadow-lg" 
           />
         </div>
 
         {/* Title */}
-        <h1 className="text-5xl font-serif font-semibold mb-12 text-[var(--zen-foreground)]">
+        <h1 className="text-4xl md:text-5xl font-serif font-semibold mb-8 md:mb-12 text-[var(--zen-foreground)] drop-shadow-md">
           ZENOKU
         </h1>
 
         {/* Tagline */}
-        <p className="text-xl mb-8 font-light text-[var(--zen-foreground)]">
-         Experience the calming challenge of Sudoku <Coffee className="inline-block ml-2" size={16} />
+        <p className="text-lg md:text-xl mb-6 md:mb-8 font-light text-[var(--zen-foreground)] drop-shadow-sm">
+        Experience the calming challenge of Sudoku <Coffee className="inline-block ml-2" size={16} />
         </p>
 
         {/* CTA Button and Info Button Container */}
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-6 md:gap-8">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setGameStarted(true)}
-            className="px-8 py-3 border border-[var(--zen-foreground)] rounded-lg text-[var(--zen-foreground)] font-medium hover:bg-[var(--zen-foreground)] hover:text-[var(--zen-background)] transition-colors"
+            className="px-8 py-3 border border-[var(--zen-foreground)] rounded-lg text-[var(--zen-foreground)] font-medium hover:bg-[var(--zen-foreground)] hover:text-[var(--zen-background)] transition-colors drop-shadow-md"
           >
             Play
           </motion.button>
@@ -63,7 +63,7 @@ export default function Home() {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setShowInfoModal(true)}
-            className="flex items-center justify-center p-2 mt-20 rounded-full border border-[var(--zen-foreground)] text-[var(--zen-foreground)] hover:bg-[var(--zen-foreground)] hover:text-[var(--zen-background)] transition-colors"
+            className="flex items-center justify-center p-2 mt-8 md:mt-20 rounded-full border border-[var(--zen-foreground)] text-[var(--zen-foreground)] hover:bg-[var(--zen-foreground)] hover:text-[var(--zen-background)] transition-colors drop-shadow-md"
             aria-label="How to play Sudoku"
           >
             <Info size={20} />
@@ -86,15 +86,15 @@ export default function Home() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-gray-800 text-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-600"
+              className="bg-gray-800 text-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-600 drop-shadow-2xl"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-serif font-semibold text-white">
+                <h2 className="text-2xl font-serif font-semibold text-white drop-shadow-md">
                   How to Play Sudoku
                 </h2>
                 <button
                   onClick={() => setShowInfoModal(false)}
-                  className="p-2 rounded-full hover:bg-gray-700 transition-colors"
+                  className="p-2 rounded-full hover:bg-gray-700 transition-colors drop-shadow-md"
                 >
                   <X size={24} className="text-white" />
                 </button>
@@ -103,31 +103,31 @@ export default function Home() {
               <div className="grid md:grid-cols-2 gap-8">
                 {/* Rules Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white mb-4">
+                  <h3 className="text-lg font-semibold text-white mb-4 drop-shadow-sm">
                     Rules & Objective
                   </h3>
                   
                   <div className="space-y-3 text-white">
-                    <p>
+                    <p className="drop-shadow-sm">
                       <strong>Goal:</strong> Fill the 9×9 grid so that every row, column, and 3×3 box contains the digits 1-9 exactly once.
                     </p>
                     
                     <div>
-                      <strong>Three Simple Rules:</strong>
+                      <strong className="drop-shadow-sm">Three Simple Rules:</strong>
                       <ul className="mt-2 space-y-1 ml-4">
-                        <li>• Each <strong>row</strong> must contain digits 1-9 (no repeats)</li>
-                        <li>• Each <strong>column</strong> must contain digits 1-9 (no repeats)</li>
-                        <li>• Each <strong>3×3 box</strong> must contain digits 1-9 (no repeats)</li>
+                        <li className="drop-shadow-sm">• Each <strong>row</strong> must contain digits 1-9 (no repeats)</li>
+                        <li className="drop-shadow-sm">• Each <strong>column</strong> must contain digits 1-9 (no repeats)</li>
+                        <li className="drop-shadow-sm">• Each <strong>3×3 box</strong> must contain digits 1-9 (no repeats)</li>
                       </ul>
                     </div>
                     
                     <div>
-                      <strong>How to Play:</strong>
+                      <strong className="drop-shadow-sm">How to Play:</strong>
                       <ul className="mt-2 space-y-1 ml-4">
-                        <li>• Click on an empty cell</li>
-                        <li>• Enter a number from 1-9</li>
-                        <li>• Use logic to determine which numbers can go where</li>
-                        <li>• Start with cells that have fewer possible options</li>
+                        <li className="drop-shadow-sm">• Click on an empty cell</li>
+                        <li className="drop-shadow-sm">• Enter a number from 1-9</li>
+                        <li className="drop-shadow-sm">• Use logic to determine which numbers can go where</li>
+                        <li className="drop-shadow-sm">• Start with cells that have fewer possible options</li>
                       </ul>
                     </div>
                   </div>
@@ -135,7 +135,7 @@ export default function Home() {
 
                 {/* Demo Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-white mb-4 ml-15">
+                  <h3 className="text-lg font-semibold text-white mb-4 ml-15 drop-shadow-sm">
                   Demo
                   </h3>
                   <SudokuDemo />
