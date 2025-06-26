@@ -17,16 +17,70 @@ export default function Home() {
 
   return (
     <div
-      className="relative min-h-screen flex flex-col items-center justify-start md:justify-center bg-no-repeat bg-cover px-4 pt-16 md:pt-0"
+      className="relative min-h-0 h-screen max-h-screen overflow-hidden flex flex-col items-center justify-center bg-no-repeat bg-cover px-4"
       style={{ backgroundColor: 'var(--zen-background)' }}
     >
-      {/* Decorative bamboo or wave SVGs can be added here with absolute positioning */}
+      {/* Top-right wave pattern */}
+      <div className="absolute top-0 -right-4 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 pointer-events-none">
+        <img 
+          src="/pattern/waves.png" 
+          alt="" 
+          className="w-full h-full object-cover transform rotate-180" 
+        />
+      </div>
+
+      {/* Bottom-left wave pattern */}
+      <div className="absolute bottom-8 -left-4 w-72 h-72 sm:w-80 sm:h-80 md:w-100 md:h-100 pointer-events-none z-20">
+        <img 
+          src="/pattern/waves.png" 
+          alt="" 
+          className="w-full h-full object-cover" 
+        />
+      </div>
+
+      {/* right bamboo decoration - main (MASSIVE) */}
+      {/* Right bamboo decoration - main */}
+      <div className="absolute -right-12 bottom-0 w-44 h-[120vh] sm:w-56 sm:h-[150vh] md:w-72 md:h-[180vh] pointer-events-none">
+        <img 
+          src="/pattern/bamboo.png" 
+          alt="" 
+          className="w-full h-full object-contain object-bottom" 
+        />
+      </div>
+
+      {/* leftt bamboo decoration - additional (MASSIVE) */}
+      {/* Left bamboo decoration - additional */}
+      <div className="absolute -left-20 bottom-0 w-36 h-[150vh] sm:left-12 sm:w-48 sm:h-[160vh] md:left-28 md:w-64 md:h-[180vh] pointer-events-none">
+        <img 
+          src="/pattern/bamboo.png" 
+          alt="" 
+          className="w-full h-full object-contain object-bottom" 
+        />
+      </div>
+
+      {/* LEFTTT bamboo decoration - main (MASSIVE) */}
+      <div className="absolute -left-4 bottom-0 w-40 h-[150vh] sm:w-52 sm:h-[160vh] md:w-72 md:h-[180vh] pointer-events-none z-1">
+        <img 
+          src="/pattern/bamboo.png" 
+          alt="" 
+          className="w-full h-full object-contain object-bottom transform scale-x-[-1]" 
+        />
+      </div>
+
+      {/* Right bamboo decoration - additional (MASSIVE) */}
+      <div className="absolute right-8 bottom-0 w-36 h-[120vh] sm:right-20 sm:w-48 sm:h-[150vh] md:right-28 md:w-64 md:h-[180vh] pointer-events-none">
+        <img 
+          src="/pattern/bamboo.png" 
+          alt="" 
+          className="w-full h-full object-contain object-bottom transform scale-x-[-1]" 
+        />
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="text-center max-w-xl mx-auto px-4"
+        className="text-center max-w-xl mx-auto px-4 relative z-10 -mt-42 md:-mt-40"
       >
         {/* Zenoku Logo */}
         <div className="mb-6 md:mb-8">
@@ -44,7 +98,7 @@ export default function Home() {
 
         {/* Tagline */}
         <p className="text-lg md:text-xl mb-6 md:mb-8 font-light text-[var(--zen-foreground)] drop-shadow-sm">
-        Experience the calming challenge of Sudoku <Coffee className="inline-block ml-2" size={16} />
+          Experience the calming challenge of Sudoku <Coffee className="inline-block ml-2" size={16} />
         </p>
 
         {/* CTA Button and Info Button Container */}
@@ -217,7 +271,7 @@ function SudokuDemo() {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className="grid grid-cols-9 gap-0 border-2 border-gray-400 w-72 h-72">
+      <div className="grid grid-cols-9 gap-0 border-2 border-gray-400 w-64 h-64">
         {demoGrid.map((row, rowIndex) =>
           row.map((cell, colIndex) => {
             const isHighlighted = highlightCell.row === rowIndex && highlightCell.col === colIndex;
